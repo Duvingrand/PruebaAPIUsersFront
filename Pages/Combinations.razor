@@ -1,0 +1,56 @@
+@page "/combinations"
+
+<h3>Combination</h3>
+
+<p>Ingresa cadenas separadas por comas:</p>
+<input @bind="inputText" />
+<button @onclick="GenerateCombinations">Generar Combinaciones</button>
+
+@if (combinations != null && combinations.Count > 0)
+{
+    <div>
+        @foreach (var item in combinations)
+        {
+            <p>@item</p>
+        }
+    </div>
+}
+
+@code {
+    private string inputText;
+    private List<string> combinations;
+
+    private void GenerateCombinations()
+    {
+        combinations = new List<string>();
+        var strings = inputText.Split(',');
+        foreach (var str in strings)
+        {
+            var cleanString = str.Trim();
+            var result = GetCombinations(cleanString);
+            combinations.Add($"{string.Join(", ", result)}");
+        }
+    }
+
+    private List<string> GetCombinations(string input)
+    {
+        var result = new List<string>();
+        Permute(input, string.Empty, result);
+        return result;
+    }
+
+    private void Permute(string str, string current, List<string> result)
+    {
+        if (str.Length == 0)
+        {
+            result.Add(current);
+            return;
+        }
+
+        for (int i = 0; i < str.Length; i++)
+        {
+            var remaining = str.Substring(0, i) + str.Substring(i + 1);
+            Permute(remaining, current + str[i], result);
+        }
+    }
+}

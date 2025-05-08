@@ -1,0 +1,101 @@
+@page "/users/edit/{Id:int}"
+@using PruebaFront.DTOs
+@using PruebaFront.Services
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+
+<h3>Update User</h3>
+
+@if (user == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6">
+            <EditForm Model="@user" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <InputText id="name" @bind-Value="user.Name" class="form-control" />
+                    <ValidationMessage For="@(() => user.Name)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <InputText id="lastName" @bind-Value="user.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => user.LastName)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="documentID" class="form-label">Document ID</label>
+                    <InputText id="documentID" @bind-Value="user.DocumentID" class="form-control" />
+                    <ValidationMessage For="@(() => user.DocumentID)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="tellNumber" class="form-label">Phone Number</label>
+                    <InputText id="tellNumber" @bind-Value="user.TellNumber" class="form-control" />
+                    <ValidationMessage For="@(() => user.TellNumber)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <InputText id="address" @bind-Value="user.Address" class="form-control" />
+                    <ValidationMessage For="@(() => user.Address)" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="birthDay" class="form-label">Birth Date</label>
+                    <InputText id="birthDay" @bind-Value="user.BirthDay" class="form-control" type="date" />
+                    <ValidationMessage For="@(() => user.BirthDay)" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private UserDTO user;
+    private List<UserResponseDTO> allUsers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allUsers = await UserService.GetAllUsers();
+        var existingUser = allUsers.FirstOrDefault(u => u.Id == Id);
+        
+        if (existingUser != null)
+        {
+            // Map from UserResponseDTO to UserDTO
+            user = new UserDTO
+            {
+                Name = existingUser.Name,
+                LastName = existingUser.LastName,
+                Address = existingUser.Address,
+                TellNumber = existingUser.TellNumber,
+                BirthDay = existingUser.BirthDay,
+                DocumentID = existingUser.DocumentID
+            };
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await UserService.UpdateUser(Id, user);
+        NavigationManager.NavigateTo("/users");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/users");
+    }
+}

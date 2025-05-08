@@ -1,0 +1,29 @@
+@page "/counter"
+
+<h3>Counter</h3>
+
+<p>Números del 0 al 100, aumentando de 3 en 3:</p>
+<div>
+    @foreach (var number in numbers)
+    {
+        @number; 
+    }
+</div>
+
+@code {
+    private List<int> numbers = new List<int>();
+
+    protected override void OnInitialized()
+    {
+        GenerateNumbers(0, 100);
+    }
+
+    private void GenerateNumbers(int current, int max)
+    {
+        if (current <= max)
+        {
+            numbers.Add(current);
+            GenerateNumbers(current + 3, max);
+        }
+    }
+}
